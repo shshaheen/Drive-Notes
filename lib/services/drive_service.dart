@@ -1,5 +1,4 @@
 import 'dart:convert';
-
 import 'package:googleapis/drive/v3.dart' as drive;
 
 class DriveService {
@@ -8,9 +7,10 @@ class DriveService {
   DriveService(this.driveApi);
 
   Future<String> _getOrCreateDriveNotesFolder() async {
-    final query = "mimeType = 'application/vnd.google-apps.folder' and name = 'DriveNotes' and trashed = false";
+    final query =
+        "mimeType = 'application/vnd.google-apps.folder' and name = 'DriveNotes' and trashed = false";
     final result = await driveApi.files.list(q: query);
-    if (result.files!.isNotEmpty) {
+    if (result.files?.isNotEmpty ?? false) {
       return result.files!.first.id!;
     }
 
@@ -37,36 +37,48 @@ class DriveService {
     await driveApi.files.create(file, uploadMedia: media);
   }
 
-  Future<List<drive.File>> listNotes() async {
+  Future<List<drive.File>> listNoteFiles() async {
     final folderId = await _getOrCreateDriveNotesFolder();
-    final query = "'$folderId' in parents and mimeType = 'text/plain' and trashed = false";
-    final result = await driveApi.files.list(q: query);
-    return result.files!;
+    final query =
+        "'$folderId' in parents and mimeType = 'text/plain' and trashed = false";
+    final result = await driveApi.files.list(
+      q: query,
+      spaces: 'drive',
+      $fields: 'files(id, name, modifiedTime)',
+    );
+    return result.files ?? [];
   }
 
   Future<String> downloadNoteContent(String fileId) async {
-    final media = await driveApi.files.get(fileId, downloadOptions: drive.DownloadOptions.fullMedia) as drive.Media;
-    final content = await media.stream.transform(utf8.decoder).join();
+    final response = await driveApi.files.get(
+      fileId,
+      downloadOptions: drive.DownloadOptions.fullMedia,
+    );
+
+    if (response is! drive.Media) {
+      throw Exception("Download failed: Not a Media object");
+    }
+
+    final content = await response.stream.transform(utf8.decoder).join();
     return content;
   }
 
-
-   Future<void> deleteNote(String fileId) async {
+  Future<void> deleteNote(String fileId) async {
     await driveApi.files.delete(fileId);
   }
 
-  Future<void> updateNote(String fileId, String newContent, {String? newTitle}) async {
-  final media = drive.Media(
-    Stream.value(newContent.codeUnits),
-    newContent.length,
-  );
+  Future<void> updateNote(String fileId, String newContent,
+      {String? newTitle}) async {
+    final media = drive.Media(
+      Stream.value(newContent.codeUnits),
+      newContent.length,
+    );
 
-  final file = drive.File();
-  if (newTitle != null && newTitle.trim().isNotEmpty) {
-    file.name = '$newTitle.txt';
+    final file = drive.File();
+    if (newTitle != null && newTitle.trim().isNotEmpty) {
+      file.name = '$newTitle.txt';
+    }
+
+    await driveApi.files.update(file, fileId, uploadMedia: media);
   }
-
-  await driveApi.files.update(file, fileId, uploadMedia: media);
-}
-
 }

@@ -1,35 +1,31 @@
+import 'package:drive_notes/providers/file_state_notifier.dart';
 import 'package:drive_notes/screens/create_note_screen.dart';
 import 'package:drive_notes/screens/edit_note_screen.dart';
 import 'package:drive_notes/screens/widgets/note_tile.dart';
-import 'package:drive_notes/services/drive_service.dart';
 import 'package:flutter/material.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:googleapis/drive/v3.dart' as drive;
 
-class MainScreen extends StatelessWidget {
-  final DriveService driveService;
-
-  const MainScreen({super.key, required this.driveService});
+class MainScreen extends ConsumerWidget {
+  const MainScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final filesAsync = ref.watch(driveFilesProvider);
+    final driveService = ref.watch(driveFilesProvider.notifier).driveService;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Drive Notes"),
         backgroundColor: Colors.blueAccent,
       ),
-      body: FutureBuilder<List<drive.File>>(
-        future: driveService.listNotes(),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Center(child: CircularProgressIndicator());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: \${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return const Center(
-                child: Text("No notes found in DriveNotes folder."));
+      body: filesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, _) => Center(child: Text('Error: $err')),
+        data: (files) {
+          if (files.isEmpty) {
+            return const Center(child: Text("No notes found in DriveNotes folder."));
           }
-
-          final files = snapshot.data!;
 
           return ListView.builder(
             itemCount: files.length,
@@ -43,16 +39,12 @@ class MainScreen extends StatelessWidget {
                     MaterialPageRoute(
                       builder: (_) => EditNoteScreen(
                         noteFile: file,
-                        driveService: driveService,
                       ),
                     ),
                   );
                 },
-                driveService: driveService,
-                onDelete: () {
-                  // This rebuilds the screen to refresh the list
-                  (context as Element).reassemble();
-                },
+                
+                
               );
             },
           );
@@ -63,7 +55,7 @@ class MainScreen extends StatelessWidget {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (_) => CreateNoteScreen(driveService: driveService),
+              builder: (_) => CreateNoteScreen(),
             ),
           );
         },

@@ -1,15 +1,18 @@
 import 'package:drive_notes/screens/main_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
-import '../services/google_auth_service.dart';
-import '../services/drive_service.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+// import 'package:googleapis/drive/v3.dart' as drive;
+import '../providers/auth_state_provider.dart';
+// import '../services/drive_service.dart';
 
-class WelcomeScreen extends StatelessWidget {
-  WelcomeScreen({super.key});
-  final GoogleAuthService _authService = GoogleAuthService();
+class WelcomeScreen extends ConsumerWidget {
+  const WelcomeScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final authState = ref.watch(authStateProvider);
+    final authNotifier = ref.read(authStateProvider.notifier);
+
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
       body: SafeArea(
@@ -34,28 +37,33 @@ class WelcomeScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
-                  onPressed: () async {
-                    final user = await _authService.signInWithGoogle();
-                    if (user != null) {
-                      final client = _authService.getAuthenticatedClient();
-                      final driveApi = drive.DriveApi(client);
-                      final driveService = DriveService(driveApi);
+                  onPressed: authState.isLoading
+                      ? null
+                      : () async {
+                          await authNotifier.signIn();
+                          final user = ref.read(authStateProvider).value;
 
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              MainScreen(driveService: driveService),
-                        ),
-                        (route) => false,
-                      );
-                    } else {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Sign-in failed. Please try again.'),
-                        ),
-                      );
-                    }
-                  },
+                          if (user != null) {
+                            // final client = authNotifier.authService.getAuthenticatedClient();
+                            // final driveApi = drive.DriveApi(client);
+                            // final driveService = DriveService(driveApi);
+
+                            if (context.mounted) {
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) => MainScreen(),
+                                ),
+                                (route) => false,
+                              );
+                            }
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Sign-in failed. Please try again.'),
+                              ),
+                            );
+                          }
+                        },
                   icon: Image.asset(
                     'assets/images/google_logo.png',
                     height: 24,
@@ -65,8 +73,7 @@ class WelcomeScreen extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.white,
                     foregroundColor: Colors.black87,
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                     elevation: 4,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

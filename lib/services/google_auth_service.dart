@@ -20,7 +20,7 @@ class GoogleAuthService {
       final GoogleSignInAccount? account = await _googleSignIn.signIn();
 
       if (account == null) {
-        print("User cancelled sign in");
+        // print("User cancelled sign in");
         return null;
       }
 

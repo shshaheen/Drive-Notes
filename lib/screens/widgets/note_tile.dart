@@ -1,23 +1,20 @@
-import 'package:drive_notes/services/drive_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:drive_notes/providers/file_state_notifier.dart';
 
-class NoteTile extends StatelessWidget {
+class NoteTile extends ConsumerWidget {
   final drive.File file;
   final VoidCallback onTap;
-  final DriveService driveService;
-  final VoidCallback onDelete; // To refresh the list after deletion
 
   const NoteTile({
     super.key,
     required this.file,
     required this.onTap,
-    required this.driveService,
-    required this.onDelete,
   });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Card(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       child: ListTile(
@@ -48,8 +45,10 @@ class NoteTile extends StatelessWidget {
           );
 
           if (confirm == true) {
-            await driveService.deleteNote(file.id!);
-            onDelete(); // Call back to refresh the notes list
+            await ref.read(driveFilesProvider.notifier).deleteFile(file.id!);
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(content: Text('Note deleted')),
+            );
           }
         },
       ),

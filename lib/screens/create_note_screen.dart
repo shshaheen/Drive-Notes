@@ -1,49 +1,44 @@
+import 'package:drive_notes/providers/file_state_notifier.dart';
 import 'package:flutter/material.dart';
-import '../services/drive_service.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class CreateNoteScreen extends StatefulWidget {
-  final DriveService driveService;
-
-  const CreateNoteScreen({super.key, required this.driveService});
+class CreateNoteScreen extends ConsumerStatefulWidget {
+  const CreateNoteScreen({super.key});
 
   @override
-  State<CreateNoteScreen> createState() => _CreateNoteScreenState();
+  ConsumerState<CreateNoteScreen> createState() => _CreateNoteScreenState();
 }
 
-class _CreateNoteScreenState extends State<CreateNoteScreen> {
+class _CreateNoteScreenState extends ConsumerState<CreateNoteScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
   bool _isSaving = false;
 
-void _saveNote() async {
-  final title = _titleController.text.trim().isEmpty ? 'Untitled' : _titleController.text.trim();
-  final content = _contentController.text.trim();
-  if (title.isEmpty && content.isEmpty) return;
+  void _saveNote() async {
+    final title = _titleController.text.trim().isEmpty ? 'Untitled' : _titleController.text.trim();
+    final content = _contentController.text.trim();
+    if (title.isEmpty && content.isEmpty) return;
 
-  // Hide keyboard
-  FocusScope.of(context).unfocus();
+    FocusScope.of(context).unfocus();
+    setState(() => _isSaving = true);
 
-  setState(() => _isSaving = true);
+    final driveService = ref.read(driveFilesProvider.notifier).driveService;
+    await driveService.uploadNote(content, title);
 
-  await widget.driveService.uploadNote(content, title);
+    await ref.read(driveFilesProvider.notifier).refreshFiles();
 
-  setState(() => _isSaving = false);
+    setState(() => _isSaving = false);
+    HapticFeedback.mediumImpact();
 
-  // Optional haptic feedback
-  HapticFeedback.mediumImpact();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Note saved successfully')),
+    );
 
-  // Show confirmation
-  ScaffoldMessenger.of(context).showSnackBar(
-    const SnackBar(content: Text('Note saved successfully')),
-  );
-
-  // Pop back after a short delay (optional)
-  Future.delayed(const Duration(milliseconds: 400), () {
-    if (mounted) Navigator.pop(context);
-  });
-}
-
+    Future.delayed(const Duration(milliseconds: 400), () {
+      if (mounted) Navigator.pop(context);
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,13 +88,12 @@ void _saveNote() async {
                   hintText: 'Start writing...',
                   border: InputBorder.none,
                 ),
-                onChanged: (_) => setState(() {}), // updates char count
+                onChanged: (_) => setState(() {}),
               ),
             ),
           ],
         ),
       ),
-      
     );
   }
 
