@@ -50,17 +50,23 @@ class DriveService {
     return content;
   }
 
-  Future<void> updateNote(String fileId, String newContent) async {
-    final media = drive.Media(
-      Stream.value(newContent.codeUnits),
-      newContent.length,
-    );
-
-    final file = drive.File(); // No name or meta change, just content
-    await driveApi.files.update(file, fileId, uploadMedia: media);
-  }
 
    Future<void> deleteNote(String fileId) async {
     await driveApi.files.delete(fileId);
   }
+
+  Future<void> updateNote(String fileId, String newContent, {String? newTitle}) async {
+  final media = drive.Media(
+    Stream.value(newContent.codeUnits),
+    newContent.length,
+  );
+
+  final file = drive.File();
+  if (newTitle != null && newTitle.trim().isNotEmpty) {
+    file.name = '$newTitle.txt';
+  }
+
+  await driveApi.files.update(file, fileId, uploadMedia: media);
+}
+
 }
