@@ -59,4 +59,8 @@ class DriveService {
     final file = drive.File(); // No name or meta change, just content
     await driveApi.files.update(file, fileId, uploadMedia: media);
   }
+
+   Future<void> deleteNote(String fileId) async {
+    await driveApi.files.delete(fileId);
+  }
 }
