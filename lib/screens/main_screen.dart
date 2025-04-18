@@ -29,20 +29,35 @@ class MainScreen extends ConsumerWidget {
                 child: Text("No notes found in DriveNotes folder."));
           }
 
-          return ListView.builder(
-            itemCount: files.length,
-            itemBuilder: (context, index) {
-              final file = files[index];
-              return NoteTile(
-                file: file,
-                onTap: () {
-                  context.pushNamed(
-                    'editNote',
-                    extra: file,
-                  );
-                },
+          return AnimatedSwitcher(
+            duration: const Duration(milliseconds: 300),
+            child: ListView.builder(
+              itemCount: files.length,
+        itemBuilder: (context, index) {
+          final file = files[index];
+          return TweenAnimationBuilder<double>(
+            tween: Tween(begin: 0, end: 1),
+            duration: Duration(milliseconds: 400 + (index * 40)),
+            builder: (context, value, child) {
+              return Opacity(
+                opacity: value,
+                child: Transform.translate(
+                  offset: Offset(0, (1 - value) * 30),
+                  child: child,
+                ),
               );
             },
+            child: NoteTile(
+              file: file,
+              onTap: () {
+                context.pushNamed('editNote', extra: file);
+              },
+            ),
+          );
+        }
+
+
+            ),
           );
         },
       ),

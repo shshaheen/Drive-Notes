@@ -21,27 +21,46 @@ final _router = GoRouter(
       path: '/',
       name: 'root',
       redirect: (context, state) {
-        // Will redirect based on auth in the ShellRoute below
-        return null;
+        return null; // Let ShellRoute handle redirection
       },
       builder: (context, state) => const _AuthGate(),
     ),
+
     GoRoute(
       path: '/create',
       name: 'createNote',
-      builder: (context, state) => const CreateNoteScreen(),
+      pageBuilder: (context, state) {
+        return CustomTransitionPage(
+          child: const CreateNoteScreen(),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        );
+      },
     ),
+
     GoRoute(
       path: '/edit',
       name: 'editNote',
-      builder: (context, state) {
+      pageBuilder: (context, state) {
         final noteFile = state.extra as NoteFile;
-        return EditNoteScreen(noteFile: noteFile);
+        return CustomTransitionPage(
+          child: EditNoteScreen(noteFile: noteFile),
+          transitionsBuilder: (context, animation, secondaryAnimation, child) {
+            return FadeTransition(
+              opacity: animation,
+              child: child,
+            );
+          },
+        );
       },
-),
-
+    ),
   ],
 );
+
 
 var kLightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
 var kDarkColorScheme = ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: Color(0xFF64B5F6));
