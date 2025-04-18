@@ -68,14 +68,15 @@ class _EditNoteScreenState extends ConsumerState<EditNoteScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        foregroundColor: Colors.black,
+        backgroundColor: Colors.transparent, // or Theme.of(context).appBarTheme.backgroundColor,
+        foregroundColor: Theme.of(context).colorScheme.onSurface, // makes it adapt to light/dark theme
         elevation: 0,
         leading: const BackButton(),
         actions: [
           IconButton(
             icon: const Icon(Icons.check),
             onPressed: _isSaving ? null : _saveNote,
+            color: Theme.of(context).colorScheme.primary, // or any theme color
           ),
         ],
       ),

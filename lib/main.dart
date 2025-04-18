@@ -10,6 +10,16 @@ void main() {
   runApp(const ProviderScope(child: MyApp()));
 }
 
+var kLightColorScheme = ColorScheme.fromSeed(
+  seedColor: Colors.blueAccent,
+);
+
+var kDarkColorScheme = ColorScheme.fromSeed(
+  brightness: Brightness.dark,
+  seedColor: Color(0xFF64B5F6),
+);
+
+
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
 
@@ -19,6 +29,43 @@ class MyApp extends ConsumerWidget {
 
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+
+      themeMode: ThemeMode.system,
+      theme: ThemeData(
+        colorScheme: kLightColorScheme,
+        appBarTheme: AppBarTheme(
+          backgroundColor: kLightColorScheme.primary,
+          foregroundColor: kLightColorScheme.onPrimary,
+        ),
+        cardTheme: CardTheme(
+          color: kLightColorScheme.secondaryContainer,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kLightColorScheme.primary,
+            foregroundColor: kLightColorScheme.onPrimary,
+          ),
+        ),
+      ),
+      darkTheme: ThemeData.dark().copyWith(
+        colorScheme: kDarkColorScheme,
+        appBarTheme: AppBarTheme(
+          backgroundColor: kDarkColorScheme.inversePrimary,
+          foregroundColor: kDarkColorScheme.onPrimary,
+        ),
+        cardTheme: CardTheme(
+          color: kDarkColorScheme.secondaryContainer,
+          margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: kDarkColorScheme.primary,
+            foregroundColor: kDarkColorScheme.onPrimary,
+          ),
+        ),
+      ),
+
       title: 'Drive Notes',
       home: authState.when(
         data: (user) {

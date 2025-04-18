@@ -17,7 +17,7 @@ class MainScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text("My Drive Notes"),
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Theme.of(context).colorScheme.primary,
       ),
       body: filesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator()),
@@ -59,7 +59,7 @@ class MainScreen extends ConsumerWidget {
             ),
           );
         },
-        backgroundColor: Colors.blueAccent,
+        backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add),
       ),
     );
