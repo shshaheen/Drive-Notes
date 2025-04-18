@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:drive_notes/models/note_file.dart';
 import 'package:drive_notes/providers/auth_state_provider.dart';
 import 'package:drive_notes/screens/create_note_screen.dart';
 import 'package:drive_notes/screens/edit_note_screen.dart';
@@ -34,7 +35,7 @@ final _router = GoRouter(
       path: '/edit',
       name: 'editNote',
       builder: (context, state) {
-        final noteFile = state.extra as drive.File;
+        final noteFile = state.extra as NoteFile;
         return EditNoteScreen(noteFile: noteFile);
       },
 ),

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:drive_notes/models/note_file.dart'; // Import your NoteFile model
 import 'package:drive_notes/providers/file_state_notifier.dart';
 
 class NoteTile extends ConsumerWidget {
-  final drive.File file;
+  final NoteFile file;
   final VoidCallback onTap;
 
   const NoteTile({
@@ -20,9 +20,9 @@ class NoteTile extends ConsumerWidget {
       child: ListTile(
         leading: const Icon(Icons.description, color: Colors.blueAccent),
         title: Text(
-          (file.name != null && file.name!.endsWith('.txt'))
-              ? file.name!.replaceAll(RegExp(r'\.txt$'), '')
-              : (file.name ?? 'Untitled'),
+          file.name.endsWith('.txt')
+              ? file.name.replaceAll(RegExp(r'\.txt$'), '')
+              : file.name,
         ),
         onTap: onTap,
         onLongPress: () async {
@@ -45,7 +45,7 @@ class NoteTile extends ConsumerWidget {
           );
 
           if (confirm == true) {
-            await ref.read(driveFilesProvider.notifier).deleteFile(file.id!);
+            await ref.read(driveFilesProvider.notifier).deleteFile(file.id);
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(content: Text('Note deleted')),
             );

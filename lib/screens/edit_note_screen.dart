@@ -1,3 +1,4 @@
+import 'package:drive_notes/models/note_file.dart';
 import 'package:drive_notes/providers/file_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -5,7 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:googleapis/drive/v3.dart' as drive;
 
 class EditNoteScreen extends ConsumerStatefulWidget {
-  final drive.File noteFile;
+  final NoteFile noteFile;
 
   const EditNoteScreen({super.key, required this.noteFile});
 

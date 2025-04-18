@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:googleapis/drive/v3.dart' as drive;
+import '../models/note_file.dart';
 
 class DriveService {
   final drive.DriveApi driveApi;
@@ -37,17 +38,37 @@ class DriveService {
     await driveApi.files.create(file, uploadMedia: media);
   }
 
-  Future<List<drive.File>> listNoteFiles() async {
-    final folderId = await _getOrCreateDriveNotesFolder();
-    final query =
-        "'$folderId' in parents and mimeType = 'text/plain' and trashed = false";
-    final result = await driveApi.files.list(
-      q: query,
-      spaces: 'drive',
-      $fields: 'files(id, name, modifiedTime)',
-    );
-    return result.files ?? [];
-  }
+  // Future<List<NoteFile>> listNoteFiles() async {
+  //   final folderId = await _getOrCreateDriveNotesFolder();
+  //   final query =
+  //       "'$folderId' in parents and mimeType = 'text/plain' and trashed = false";
+  //   final result = await driveApi.files.list(
+  //     q: query,
+  //     spaces: 'drive',
+  //     $fields: 'files(id, name, modifiedTime)',
+  //   );
+
+  //   final files = result.files ?? [];
+  //   return files.map((f) => NoteFile(
+  //     id: f.id ?? '',
+  //     name: f.name ?? 'Untitled',
+  //   )).toList();
+  // }
+Future<List<NoteFile>> listNoteFiles() async {
+  final folderId = await _getOrCreateDriveNotesFolder();
+  final query = "'$folderId' in parents and mimeType = 'text/plain' and trashed = false";
+  final result = await driveApi.files.list(
+    q: query,
+    spaces: 'drive',
+    $fields: 'files(id, name, modifiedTime)',
+  );
+
+  final files = result.files ?? [];
+  return files
+      .where((f) => f.id != null && f.name != null)
+      .map((f) => NoteFile(id: f.id!, name: f.name!))
+      .toList();
+}
 
   Future<String> downloadNoteContent(String fileId) async {
     final response = await driveApi.files.get(
