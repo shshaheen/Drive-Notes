@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'package:drive_notes/models/note_file.dart';
 import 'package:drive_notes/providers/auth_state_provider.dart';
 import 'package:drive_notes/screens/create_note_screen.dart';
@@ -8,9 +7,21 @@ import 'package:drive_notes/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:path_provider/path_provider.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // ✅ Step 1: Initialize Hive
+  await Hive.initFlutter();
+
+  // ✅ Step 2: Register adapter
+  Hive.registerAdapter(NoteFileAdapter());
+
+  // ✅ Step 3: Open Hive box
+  await Hive.openBox<NoteFile>('notesBox');
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
@@ -20,28 +31,18 @@ final _router = GoRouter(
     GoRoute(
       path: '/',
       name: 'root',
-      redirect: (context, state) {
-        return null; // Let ShellRoute handle redirection
-      },
+      redirect: (context, state) => null,
       builder: (context, state) => const _AuthGate(),
     ),
-
     GoRoute(
       path: '/create',
       name: 'createNote',
-      pageBuilder: (context, state) {
-        return CustomTransitionPage(
-          child: const CreateNoteScreen(),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
-        );
-      },
+      pageBuilder: (context, state) => CustomTransitionPage(
+        child: const CreateNoteScreen(),
+        transitionsBuilder: (context, animation, _, child) =>
+            FadeTransition(opacity: animation, child: child),
+      ),
     ),
-
     GoRoute(
       path: '/edit',
       name: 'editNote',
@@ -49,21 +50,19 @@ final _router = GoRouter(
         final noteFile = state.extra as NoteFile;
         return CustomTransitionPage(
           child: EditNoteScreen(noteFile: noteFile),
-          transitionsBuilder: (context, animation, secondaryAnimation, child) {
-            return FadeTransition(
-              opacity: animation,
-              child: child,
-            );
-          },
+          transitionsBuilder: (context, animation, _, child) =>
+              FadeTransition(opacity: animation, child: child),
         );
       },
     ),
   ],
 );
 
-
 var kLightColorScheme = ColorScheme.fromSeed(seedColor: Colors.blueAccent);
-var kDarkColorScheme = ColorScheme.fromSeed(brightness: Brightness.dark, seedColor: Color(0xFF64B5F6));
+var kDarkColorScheme = ColorScheme.fromSeed(
+  brightness: Brightness.dark,
+  seedColor: const Color(0xFF64B5F6),
+);
 
 class MyApp extends ConsumerWidget {
   const MyApp({super.key});
@@ -72,7 +71,7 @@ class MyApp extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      routerConfig: _router, // <--- use GoRouter here!
+      routerConfig: _router,
       themeMode: ThemeMode.system,
       theme: ThemeData(
         colorScheme: kLightColorScheme,
@@ -113,7 +112,6 @@ class MyApp extends ConsumerWidget {
   }
 }
 
-/// Acts like a simple auth-based router
 class _AuthGate extends ConsumerWidget {
   const _AuthGate();
 
@@ -123,11 +121,8 @@ class _AuthGate extends ConsumerWidget {
 
     return authState.when(
       data: (user) {
-        if (user == null) {
-          return const WelcomeScreen();
-        } else {
-          return const MainScreen();
-        }
+        if (user == null) return const WelcomeScreen();
+        return const MainScreen();
       },
       loading: () => const Scaffold(
         body: Center(child: CircularProgressIndicator()),

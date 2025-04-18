@@ -1,6 +1,4 @@
 import 'package:drive_notes/providers/file_state_notifier.dart';
-import 'package:drive_notes/screens/create_note_screen.dart';
-import 'package:drive_notes/screens/edit_note_screen.dart';
 import 'package:drive_notes/screens/widgets/note_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';

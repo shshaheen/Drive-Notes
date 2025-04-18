@@ -3,7 +3,7 @@ import 'package:drive_notes/providers/file_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:googleapis/drive/v3.dart' as drive;
+// import 'package:googleapis/drive/v3.dart' as drive;
 
 class EditNoteScreen extends ConsumerStatefulWidget {
   final NoteFile noteFile;
@@ -23,14 +23,14 @@ class _EditNoteScreenState extends ConsumerState<EditNoteScreen> {
   @override
   void initState() {
     super.initState();
-    final initialTitle = widget.noteFile.name?.replaceAll(RegExp(r'\.txt$'), '') ?? 'Untitled';
+    final initialTitle = widget.noteFile.name.replaceAll(RegExp(r'\.txt$'), '') ?? 'Untitled';
     _titleController.text = initialTitle;
     _loadNoteContent();
   }
 
   void _loadNoteContent() async {
     final driveService = ref.read(driveFilesProvider.notifier).driveService;
-    final content = await driveService.downloadNoteContent(widget.noteFile.id!);
+    final content = await driveService.downloadNoteContent(widget.noteFile.id);
     _contentController.text = content;
     setState(() => _isLoading = false);
   }
