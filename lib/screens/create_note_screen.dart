@@ -2,7 +2,7 @@ import 'package:drive_notes/providers/file_state_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:go_router/go_router.dart';
 class CreateNoteScreen extends ConsumerStatefulWidget {
   const CreateNoteScreen({super.key});
 
@@ -35,8 +35,8 @@ class _CreateNoteScreenState extends ConsumerState<CreateNoteScreen> {
       const SnackBar(content: Text('Note saved successfully')),
     );
 
-    Future.delayed(const Duration(milliseconds: 400), () {
-      if (mounted) Navigator.pop(context);
+    Future.delayed(const Duration(milliseconds: 300), () {
+      if (mounted) context.pop();
     });
   }
 

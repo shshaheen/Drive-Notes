@@ -4,6 +4,7 @@ import 'package:drive_notes/screens/edit_note_screen.dart';
 import 'package:drive_notes/screens/widgets/note_tile.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 // import 'package:googleapis/drive/v3.dart' as drive;
 
 class MainScreen extends ConsumerWidget {
@@ -24,7 +25,8 @@ class MainScreen extends ConsumerWidget {
         error: (err, _) => Center(child: Text('Error: $err')),
         data: (files) {
           if (files.isEmpty) {
-            return const Center(child: Text("No notes found in DriveNotes folder."));
+            return const Center(
+                child: Text("No notes found in DriveNotes folder."));
           }
 
           return ListView.builder(
@@ -34,17 +36,11 @@ class MainScreen extends ConsumerWidget {
               return NoteTile(
                 file: file,
                 onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) => EditNoteScreen(
-                        noteFile: file,
-                      ),
-                    ),
+                  context.pushNamed(
+                    'editNote',
+                    extra: file,
                   );
                 },
-                
-                
               );
             },
           );
@@ -52,15 +48,13 @@ class MainScreen extends ConsumerWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CreateNoteScreen(),
-            ),
-          );
+          context.pushNamed('createNote');
         },
         backgroundColor: Theme.of(context).colorScheme.primary,
-        child: const Icon(Icons.add),
+        child: Icon(
+          Icons.add,
+          color: Theme.of(context).colorScheme.onPrimary,
+        ),
       ),
     );
   }
