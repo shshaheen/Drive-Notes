@@ -53,6 +53,7 @@ class _CreateNoteScreenState extends ConsumerState<CreateNoteScreen> {
         leading: const BackButton(),
         actions: [
           IconButton(
+            key: const Key('saveButton'),
             icon: const Icon(Icons.check),
             onPressed: _isSaving ? null : _saveNote,
             color: Theme.of(context).colorScheme.primary, // or any theme color
@@ -67,6 +68,7 @@ class _CreateNoteScreenState extends ConsumerState<CreateNoteScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             TextField(
+              key: const Key('titleField'),
               controller: _titleController,
               style: const TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
               decoration: const InputDecoration(
@@ -82,6 +84,7 @@ class _CreateNoteScreenState extends ConsumerState<CreateNoteScreen> {
             const SizedBox(height: 8),
             Expanded(
               child: TextField(
+                key: const Key('contentField'),
                 controller: _contentController,
                 maxLines: null,
                 expands: true,

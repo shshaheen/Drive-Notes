@@ -11,7 +11,7 @@ class MainScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final filesAsync = ref.watch(driveFilesProvider);
-    final driveService = ref.watch(driveFilesProvider.notifier).driveService;
+    // final driveService = ref.watch(driveFilesProvider.notifier).driveService;
 
     return Scaffold(
       appBar: AppBar(

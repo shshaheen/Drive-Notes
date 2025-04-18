@@ -27,13 +27,13 @@ class GoogleAuthService {
       await _secureStorage.write(key: 'accessToken', value: auth.accessToken);
       await _secureStorage.write(key: 'idToken', value: auth.idToken);
 
-      print("Access Token: ${auth.accessToken}");
+      // print("Access Token: ${auth.accessToken}");
 
       _client = _authenticatedClientFromAccessToken(auth.accessToken!);
 
       return account;
     } catch (error) {
-      print("Sign in failed: $error");
+      // print("Sign in failed: $error");
       return null;
     }
   }

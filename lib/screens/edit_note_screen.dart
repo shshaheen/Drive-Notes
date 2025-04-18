@@ -43,7 +43,7 @@ class _EditNoteScreenState extends ConsumerState<EditNoteScreen> {
     final newTitle = _titleController.text.trim().isEmpty ? 'Untitled' : _titleController.text.trim();
 
     await driveService.updateNote(
-      widget.noteFile.id!,
+      widget.noteFile.id,
       _contentController.text,
       newTitle: newTitle,
     );
