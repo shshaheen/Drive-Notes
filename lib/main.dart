@@ -81,7 +81,10 @@ class MyApp extends ConsumerWidget {
         ),
         cardTheme: CardTheme(
           color: kLightColorScheme.secondaryContainer,
+          shadowColor: kLightColorScheme.primary,
+          elevation: 5,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
@@ -98,7 +101,10 @@ class MyApp extends ConsumerWidget {
         ),
         cardTheme: CardTheme(
           color: kDarkColorScheme.secondaryContainer,
+          shadowColor: kLightColorScheme.primary,
+          elevation: 5,
           margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16))
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
